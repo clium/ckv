@@ -146,4 +146,4 @@ KEY2 =
     Value2
 ```
 
-A global attribute starts with an exclamation mark (`!`). It applied to all the keys in the file. This also applied when the file is being imported. But it doesn't effect the file it is being imported to.
+A global attribute starts with an exclamation mark (`!`). It applies to all the keys in the file. This also applies when the file is being imported. But it doesn't effect the file it is being imported to.
