@@ -20,13 +20,11 @@ import "path/to/other/file.ckv"
 This is a multi-line comment
 */
 
-// This is a variable whose value is always a string
-var xyz = abc
-
 THIS_IS_A_KEY =
   After a tab, starts the value
   Value can be spanned across multiple lines.
   Every tabbed line in continuation is part of value of THIS_IS_A_KEY.
+
 
 #[some_attribute(args_to_attribute)]
 ATTRIBUTE_EXAMPLE_KEY =
@@ -34,17 +32,22 @@ ATTRIBUTE_EXAMPLE_KEY =
   in the form of attributes. Attributes are defined by the parser implementing
   the CKV file.
   For example,
-  clium defines an attribute "use" which can be used like #[use(var(xyz))].
+  clium defines an attribute shell which specifies the shell that will execute the value. (`#[shell(zsh)]`)
+
+
+// This is an inline key-value
+XYZ = abc
 ```
 
-From a sample clium file:
+# Example from a clium CKV file
 
 ```ckv
-import "general.ckv"
+import "general.ckv"::*
 
 #[!use(std/macros)]
 
-var CC = gcc
+#[protected]
+CC = gcc
 
 OPEN =
   nvim [FILE_TO_OPEN]
@@ -90,6 +93,17 @@ An apple a day,keeps the doctor away.
 So, I eat apples every day
 ```
 
+# Inline key-value pair
+
+```ckv
+KEY1 = Value1
+
+KEY2 =
+    Value2
+```
+
+Above, `KEY1` has the value `Value1`. It is declared as an inline key-value pair. These cannot be extended to multiple lines.
+
 # Multiple keys with same name
 
 ```
@@ -105,9 +119,40 @@ KEY1 =
 
 It depends on the implementation how it will decide the value of `KEY1`. This should generally done by attributes. Some possibilities are to append, overwrite, choose the first one, raise an error, etc.
 
-# Key's metadata/attribute
+# Importing keys from other CKV files
 
-Metadata can be associated to keys in the form of attributes. This can be used by according to the context.
+```ckv
+import "path/to/other/file.ckv"::{KEY1, KEY2, KEY3}
+
+KEY4 =
+    Value1
+    
+KEY2 =
+    Value2
+```
+
+Above, we imported `KEY1`, `KEY2` and `KEY3` from `file.ckv`. Upon importing, these should act as if they were defined in the same file itself on the exact position where the `import` was called. If following keys have the same name, it depends on the implementation whether it chooses to append, overwrite,raise an error or something else.
+
+# Wildcards in import statements
+
+```
+import "<path_to_file>"::{KEY??, ABC*, DEF+}
+import "<path_to_file2>"::{*};
+```
+
+The following wildcards are available for use:
+
+- <u>Asterisk (`*`)</u>: This matches zero or more occurences of any characters. For example, `ABC*` matches `ABC`, `ABC1`, `ABC_1234`, etc.
+- <u>Plus (`+`)</u>: This matches one or more occurences of any characters. For example, `DEF+` matches `DEF1`, `DEF_1234`, etc.
+- <u>Question mark (`?`)</u>: This matches exactly one occurence of a character. For example, `KEY??` matches `KEYQQ`, `KEY12`, etc.
+- <u>Character class (`[]`)</u>: TODO
+
+The second line, `"<path_to_file2>"::{*};` asks to import all keys in the file.
+
+
+# Metadata/Attributes
+
+Metadata can be associated to keys or `import` statements in the form of attributes. This can be used by according to the context.
 
 ```ckv
 #[attr(nest_attr(val))]
@@ -115,11 +160,13 @@ KEY =
     Value
 ```
 
-- Here the key has the attribute `attr`. It's value is an attribute `nest_attr` whose value is `val`.
-- So, an attribute's value can be another attribute or value.
-- A value inside parantheses `()` can contain any string. If the string ends with `()`, then it is an attribute itself.
+- Everything in `#[attr(nest_attr(val))]` (`attr`, `nest_attr`, `val`) is an attribute.
+- Here the key has the attribute `attr`. Its value is an attribute `nest_attr` whose value is attribute `val`.
+- Attributes can be nested inside parantheses.
+- Attrubutes may or may not be followed by parantheses.
+- A value inside parantheses `()` can contain any string which itself is called an attribute.
 - If the string needs to contain  `(`, `)`, `[`, `]`, `\` or `,`, it needs to be backslashed.
-- The string passed is parsed once to process backslashes in the it. Each backslashed is removed and if the character following the backslash is any of the special chars mentioned in the previous point, then it is evaulated as it as without any special meaning.
+- The string passed is parsed once to process backslashes in the it. Each backslash is removed and if the character following the backslash is any of the special characters mentioned in the previous point, then it is evaulated as it is without any special meaning.
 
 ```ckv
 #[attr(nest_attr(val), nest_attr2(val2)), attr2()]
@@ -135,7 +182,7 @@ KEY =
     Value
 ```
 
-- It's valid to have only values on the top level.
+- It's valid to have attributes without parantheses.
 
 ```ckv
 #[attr(nest = "val")]
@@ -144,7 +191,7 @@ KEY =
 ```
 
 - In the above snippet, `nest` is an attribute which as a value `val`. The syntax is `attr = "val"`.
-- The shortcoming of this syntax is that the value of such an attribute cannot be an attribute.
+- The shortcoming of this syntax is that the value of such an attribute cannot contain more nested attributes.
 - The value is enclosed in double quotes (`" "`). Any string is allowed inside the quotes.
 - To use `"` character inside double quotes, they need to be backslashed.
 - The string is initially parsed to remove remove special meaning of a character following backslash. In this case, if you need you string to contain `"` or `\`, they need to be backslashed.
@@ -162,29 +209,3 @@ KEY2 =
 ```
 
 A global attribute starts with an exclamation mark (`!`). It applies to all the keys in the file. This also applies when the file is being imported. But it doesn't effect the file it is being imported to.
-
-# Importing keys from other CKV files
-
-```ckv
-import "path/to/other/file.ckv"::{KEY1, KEY2, KEY3}
-
-KEY4 =
-    Value1
-    
-KEY2 =
-    Value2
-```
-
-Above, we imported `KEY1`, `KEY2` and `KEY3` from `file.ckv`. Upon importing, these should act as if they were defined in the same file itself on the exact position where the `import` was called. If following keys have the same name, it depends on the implementation whether it chooses to append, overwrite,raise an error or something else.
-
-
-The syntax to import keys is as follows:
-
-```
-import "<path_to_file>"::{KEY1, KEY2, ABC.*}
-import "<path_to_file2>"::*;
-```
-
-The second line, `"<path_to_file2>"::*;` is a special syntax which asks to import all keys in the file.
-Otherwise, when importing individual keys, regex can be user (regex type TBD).
-
