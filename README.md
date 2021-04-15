@@ -26,7 +26,7 @@ THIS_IS_A_KEY =
   Every tabbed line in continuation is part of value of THIS_IS_A_KEY.
 
 
-#[some_attribute(args_to_attribute)]
+#[some_attribute(nested_attribute)]
 ATTRIBUTE_EXAMPLE_KEY =
   ATTRIBUTE_EXAMPLE_KEY has meta data associated to it
   in the form of attributes. Attributes are defined by the parser implementing
@@ -76,8 +76,7 @@ KEY =
 - Key and values are the building blocks of ckv file. A letter in the key matches the following character class: `[0-9a-zA-Z_-]`. 
 Following the key, there should be an equal-to (=).
 - The next line immediately after the key must be started with a tab. Following the tab is the value of the key.
-- If the next line also starts with a tab, it will be a part of key's value and this will go on until a line following
-- doesn't start with a tab or `----` (4 hypens).
+- If the next line also starts with a tab, it will be a part of key's value and this will go on until a following line doesn't start with a tab or `----` (4 hypens).
 - 4 hypens (`----`) in the beginning of the line state that the current line is a continuation of the previous line and a newline character should   not be added to the end of the previous line.
 
 ```ckv
@@ -117,7 +116,7 @@ KEY1 =
     Value3
 ```
 
-It depends on the implementation how it will decide the value of `KEY1`. This should generally done by attributes. Some possibilities are to append, overwrite, choose the first one, raise an error, etc.
+It depends on the implementation how it will decide the value of `KEY1`. This should generally be done by attributes. Some possibilities are to append, overwrite, choose the first one, raise an error, etc.
 
 # Importing keys from other CKV files
 
@@ -145,14 +144,13 @@ The following wildcards are available for use:
 - Asterisk (`*`): This matches zero or more occurences of any characters. For example, `ABC*` matches `ABC`, `ABC1`, `ABC_1234`, etc.
 - Plus (`+`): This matches one or more occurences of any characters. For example, `DEF+` matches `DEF1`, `DEF_1234`, etc.
 - Question mark (`?`): This matches exactly one occurence of a character. For example, `KEY??` matches `KEYQQ`, `KEY12`, etc.
-- Character class (`[]`): TODO
 
 The second line, `"<path_to_file2>"::{*};` asks to import all keys in the file.
 
 
 # Metadata/Attributes
 
-Metadata can be associated to keys or `import` statements in the form of attributes. This can be used by according to the context.
+Metadata can be associated to keys or `import` statements in the form of attributes. This can be used according to the context.
 
 ```ckv
 #[attr(nest_attr(val))]
@@ -166,7 +164,7 @@ KEY =
 - Attrubutes may or may not be followed by parantheses.
 - A value inside parantheses `()` can contain any string which itself is called an attribute.
 - If the string needs to contain  `(`, `)`, `[`, `]`, `\` or `,`, it needs to be backslashed.
-- The string passed is parsed once to process backslashes in the it. Each backslash is removed and if the character following the backslash is any of the special characters mentioned in the previous point, then it is evaulated as it is without any special meaning.
+- The string passed is parsed once to process backslashes in it. Each backslash is removed and if the character following the backslash is any of the special characters mentioned in the previous point, then it is evaulated as it is without any special meaning.
 
 ```ckv
 #[attr(nest_attr(val), nest_attr2(val2)), attr2()]
