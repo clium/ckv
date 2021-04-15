@@ -2,11 +2,11 @@
 
 Clium key value file.
 
-# AIM
+# Aim
 
 Aim of CKV file is to provide a simple, human readable, key value pair storage file that promotes reusability over multiple CKV files and lets the consumer associate meta data with the keys.
 
-# EXAMPLE
+# Example
 
 A simple example:
 
@@ -62,7 +62,7 @@ EXECUTE =
   [OUTPUT_DIR]/[INSTANCE].out
 ```
 
-# KEY-VALUE
+# Key-Value
 
 ```ckv
 KEY =
@@ -90,7 +90,22 @@ An apple a day,keeps the doctor away.
 So, I eat apples every day
 ```
 
-# KEY'S METADATA/ATTRIBUTE
+# Multiple keys with same name
+
+```
+KEY1 = 
+    Value1
+
+KEY2 =
+    Value2
+
+KEY1 =
+    Value3
+```
+
+It depends on the implementation how it will decide the value of `KEY1`. This should generally done by attributes. Some possibilities are to append, overwrite, choose the first one, raise an error, etc.
+
+# Key's metadata/attribute
 
 Metadata can be associated to keys in the form of attributes. This can be used by according to the context.
 
@@ -134,7 +149,7 @@ KEY =
 - To use `"` character inside double quotes, they need to be backslashed.
 - The string is initially parsed to remove remove special meaning of a character following backslash. In this case, if you need you string to contain `"` or `\`, they need to be backslashed.
 
-# GLOBAL METADATA/ATTRIBUTE
+# Global metadata/attribute
 
 ```ckv
 #[!attr()]
@@ -147,3 +162,29 @@ KEY2 =
 ```
 
 A global attribute starts with an exclamation mark (`!`). It applies to all the keys in the file. This also applies when the file is being imported. But it doesn't effect the file it is being imported to.
+
+# Importing keys from other CKV files
+
+```ckv
+import "path/to/other/file.ckv"::{KEY1, KEY2, KEY3}
+
+KEY4 =
+    Value1
+    
+KEY2 =
+    Value2
+```
+
+Above, we imported `KEY1`, `KEY2` and `KEY3` from `file.ckv`. Upon importing, these should act as if they were defined in the same file itself on the exact position where the `import` was called. If following keys have the same name, it depends on the implementation whether it chooses to append, overwrite,raise an error or something else.
+
+
+The syntax to import keys is as follows:
+
+```
+import "<path_to_file>"::{KEY1, KEY2, ABC.*}
+import "<path_to_file2>"::*;
+```
+
+The second line, `"<path_to_file2>"::*;` is a special syntax which asks to import all keys in the file.
+Otherwise, when importing individual keys, regex can be user (regex type TBD).
+
