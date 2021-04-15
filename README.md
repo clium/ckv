@@ -142,10 +142,10 @@ import "<path_to_file2>"::{*};
 
 The following wildcards are available for use:
 
-- <u>Asterisk (`*`)</u>: This matches zero or more occurences of any characters. For example, `ABC*` matches `ABC`, `ABC1`, `ABC_1234`, etc.
-- <u>Plus (`+`)</u>: This matches one or more occurences of any characters. For example, `DEF+` matches `DEF1`, `DEF_1234`, etc.
-- <u>Question mark (`?`)</u>: This matches exactly one occurence of a character. For example, `KEY??` matches `KEYQQ`, `KEY12`, etc.
-- <u>Character class (`[]`)</u>: TODO
+- Asterisk (`*`): This matches zero or more occurences of any characters. For example, `ABC*` matches `ABC`, `ABC1`, `ABC_1234`, etc.
+- Plus (`+`): This matches one or more occurences of any characters. For example, `DEF+` matches `DEF1`, `DEF_1234`, etc.
+- Question mark (`?`): This matches exactly one occurence of a character. For example, `KEY??` matches `KEYQQ`, `KEY12`, etc.
+- Character class (`[]`): TODO
 
 The second line, `"<path_to_file2>"::{*};` asks to import all keys in the file.
 
