@@ -116,7 +116,7 @@ KEY1 =
     Value3
 ```
 
-It depends on the implementation how it will decide the value of `KEY1`. This should generally be done by attributes. Some possibilities are to append, overwrite, choose the first one, raise an error, etc.
+It depends on the implementation how it will decide the value of `KEY1`. This should generally be done by attributes. Some possibilities are to append, overwrite, choose the first one, raise an error, etc. The implementation must not leave this as an undefined behaviour.
 
 # Importing keys from other CKV files
 
@@ -130,7 +130,9 @@ KEY2 =
     Value2
 ```
 
-Above, we imported `KEY1`, `KEY2` and `KEY3` from `file.ckv`. Upon importing, these should act as if they were defined in the same file itself on the exact position where the `import` was called. If following keys have the same name, it depends on the implementation whether it chooses to append, overwrite,raise an error or something else.
+- Above, we imported `KEY1`, `KEY2` and `KEY3` from `file.ckv`. Upon importing, these should act as if they were defined in the same file on the exact position where the `import` statement was called and in the exact order in which they are specified.
+- The keys should retain the attributes they got from the file they are imported from. This should be the default behaviour which is allowed to be changed by attributes.
+- If the keys after import `statement` have the same name, like `KEY2` in above example, it depends on the implementation whether it chooses to append, overwrite, raise an error or something else. The implementation must not leave this as an undefined behaviour.
 
 # Wildcards in import statements
 
@@ -163,7 +165,7 @@ KEY =
 - Attributes can be nested inside parantheses.
 - Attrubutes may or may not be followed by parantheses.
 - A value inside parantheses `()` can contain any string which itself is called an attribute.
-- If the string needs to contain  `(`, `)`, `[`, `]`, `\` or `,`, it needs to be backslashed.
+- If the string needs to contain  `(`, `)`, `[`, `]`, `\` or `,`, they need to be backslashed.
 - The string passed is parsed once to process backslashes in it. Each backslash is removed and if the character following the backslash is any of the special characters mentioned in the previous point, then it is evaulated as it is without any special meaning.
 
 ```ckv
@@ -192,7 +194,7 @@ KEY =
 - The shortcoming of this syntax is that the value of such an attribute cannot contain more nested attributes.
 - The value is enclosed in double quotes (`" "`). Any string is allowed inside the quotes.
 - To use `"` character inside double quotes, they need to be backslashed.
-- The string is initially parsed to remove remove special meaning of a character following backslash. In this case, if you need you string to contain `"` or `\`, they need to be backslashed.
+- The string is initially parsed to remove special meaning of a character following backslash. In this case, if you  need string to contain `"` or `\`, they need to be backslashed.
 
 # Global metadata/attribute
 
@@ -206,4 +208,5 @@ KEY2 =
     Value2
 ```
 
-A global attribute starts with an exclamation mark (`!`). It applies to all the keys in the file. This also applies when the file is being imported. But it doesn't effect the file it is being imported to.
+- A global attribute starts with an exclamation mark (`!`). It is a syntactic sugar for writing the same attribute over all the keys in the file.
+- By default, global attributes only effect the file in which they are declared.
